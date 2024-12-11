@@ -31,7 +31,7 @@ def edm_sampler(
     sigma_min = max(sigma_min, net.sigma_min)
     sigma_max = min(sigma_max, net.sigma_max)
 
-    # Time step discretization.
+    # Time step discretization. #TODO change Noise level for thesis
     step_indices = torch.arange(num_steps, dtype=torch.float64, device=latents.device)
     t_steps = (sigma_max ** (1 / rho) + step_indices / (num_steps - 1) * (sigma_min ** (1 / rho) - sigma_max ** (1 / rho))) ** rho
     t_steps = torch.cat([net.round_sigma(t_steps), torch.zeros_like(t_steps[:1])]) # t_N = 0
@@ -118,7 +118,7 @@ def ablation_sampler(
         assert discretization == 'edm'
         sigma_steps = (sigma_max ** (1 / rho) + step_indices / (num_steps - 1) * (sigma_min ** (1 / rho) - sigma_max ** (1 / rho))) ** rho
 
-    # Define noise level schedule.
+    # Define noise level schedule. #TODO change Noise level for thesis
     if schedule == 'vp':
         sigma = vp_sigma(vp_beta_d, vp_beta_min)
         sigma_deriv = vp_sigma_deriv(vp_beta_d, vp_beta_min)
@@ -291,7 +291,7 @@ def main(network_pkl, outdir, subdirs, seeds, class_idx, max_batch_size, device=
         sampler_kwargs = {key: value for key, value in sampler_kwargs.items() if value is not None}
         have_ablation_kwargs = any(x in sampler_kwargs for x in ['solver', 'discretization', 'schedule', 'scaling'])
         sampler_fn = ablation_sampler if have_ablation_kwargs else edm_sampler
-        images = sampler_fn(net, latents, class_labels, randn_like=rnd.randn_like, **sampler_kwargs)
+        images = sampler_fn(net, latents, class_labels, randn_like=rnd.randn_like, **sampler_kwargs) #KEY STEP
 
         # Save images.
         images_np = (images * 127.5 + 128).clip(0, 255).to(torch.uint8).permute(0, 2, 3, 1).cpu().numpy()
@@ -311,6 +311,15 @@ def main(network_pkl, outdir, subdirs, seeds, class_idx, max_batch_size, device=
 #----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    main()
+    
+
+    main([
+            '--network', 'https://nvlabs-fi-cdn.nvidia.com/edm/pretrained/edm-cifar10-32x32-cond-vp.pkl',
+            '--outdir', 'out',
+            '--seeds', '0-31',
+            '--batch', '32'
+    ])
+
+
 
 #----------------------------------------------------------------------------
