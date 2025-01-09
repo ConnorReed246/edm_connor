@@ -31,7 +31,7 @@ def edm_sampler(
     sigma_min = max(sigma_min, net.sigma_min)
     sigma_max = min(sigma_max, net.sigma_max)
 
-    # Time step discretization. #TODO change Noise level for thesis
+    # Time step discretization. 
     step_indices = torch.arange(num_steps, dtype=torch.float64, device=latents.device)
     t_steps = (sigma_max ** (1 / rho) + step_indices / (num_steps - 1) * (sigma_min ** (1 / rho) - sigma_max ** (1 / rho))) ** rho
     t_steps = torch.cat([net.round_sigma(t_steps), torch.zeros_like(t_steps[:1])]) # t_N = 0
@@ -118,7 +118,7 @@ def ablation_sampler(
         assert discretization == 'edm'
         sigma_steps = (sigma_max ** (1 / rho) + step_indices / (num_steps - 1) * (sigma_min ** (1 / rho) - sigma_max ** (1 / rho))) ** rho
 
-    # Define noise level schedule. #TODO change Noise level for thesis
+    # Define noise level schedule. 
     if schedule == 'vp':
         sigma = vp_sigma(vp_beta_d, vp_beta_min)
         sigma_deriv = vp_sigma_deriv(vp_beta_d, vp_beta_min)

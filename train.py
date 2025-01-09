@@ -225,7 +225,7 @@ def main(**kwargs):
             json.dump(c, f, indent=2)
         dnnlib.util.Logger(file_name=os.path.join(c.run_dir, 'log.txt'), file_mode='a', should_flush=True)
 
-    # Train. #TODO where we would have to add noise?
+    # Train. 
     training_loop.training_loop(**c)
 
 #----------------------------------------------------------------------------
